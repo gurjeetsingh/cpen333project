@@ -32,7 +32,7 @@ struct Product {
  * Menu, containing list of items that can
  * be ordered at the restaurant
  */
-class Catalogue {
+struct Catalogue {
   std::map<int,Product> product_;
   std::vector<Product> list_;
 

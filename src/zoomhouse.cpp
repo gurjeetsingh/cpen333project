@@ -32,12 +32,12 @@ void load_catalogue(Catalogue& catalogue, std::string filename) {
     std::ifstream fin(filename);
     
     if (fin.is_open()) {
-        JSON jcatalogue;
-        fin >> jcatalogue;
+        JSON jmenu;
+        fin >> jmenu;
         
-        for (auto& jitem : jcatalogue) {
-            Product product;
-           product.name = jitem["Product"];
+        for (auto& jitem : jmenu) {
+			Product product;
+           product.name = jitem["product"];
            product.price = (int) jitem["price"];
            product.product_id = (int) jitem["product_id"];
            product.weight = (int) jitem["weight"];
@@ -116,17 +116,17 @@ void init_shelves(const LayoutInfo& layoutInf, RackInfo& rackInf) {
     for (int r = 0; r < layoutInf.rows; r++) {
         std::vector<Rack> row;
         for (int c = 0; c < layoutInf.cols; c++) {
-            Rack r;
+            Rack rck;
             char ch = layoutInf.layout[r][c];
             if (ch == SHELF_CHAR) {
                 for (int i = 0; i < 10; i++) {
                     Shelf s;
                     s.weight = 0;
-                    r.left.push_back(s);
-                    r.right.push_back(s);
+                    rck.left.push_back(s);
+                    rck.right.push_back(s);
                 }
             }
-            row.push_back(r);
+            row.push_back(rck);
         }
         rackInf.racks.push_back(row);
     }
@@ -441,7 +441,7 @@ void server(DynamicOrderQueue& orders) {
  */
 int main() {
 
-    cpen333::process::condition_variable cv(ZOOMHOUSE_CONDITION_VARIABLE;
+    cpen333::process::condition_variable cv(ZOOMHOUSE_CONDITION_VARIABLE);
     cpen333::process::mutex mutex(ZOOMHOUSE_MUTEX_NAME);
     cpen333::process::shared_object<SharedData> memory(ZOOMHOUSE_MEMORY_NAME);
     

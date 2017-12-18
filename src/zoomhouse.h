@@ -37,6 +37,12 @@ struct LayoutInfo {
 	char layout[MAX_WAREHOUSE_SIZE][MAX_WAREHOUSE_SIZE];  // maze storage
 };
 
+struct Shelf {
+	std::vector<Product> products;
+	int weight;
+};
+
+
 // Rack of Shelves(represented by Hs)
 struct Rack {
 	std::vector<Shelf> left;
@@ -67,10 +73,6 @@ struct OrderInfo {
 	std::vector<Order> orders;
 };
 
-struct Shelf {
-	std::vector<Product> products;
-	int weight;
-};
 
 struct SharedData {
 	Catalogue catalogue;    // maze info
