@@ -11,7 +11,7 @@
 #include <cpen333/process/shared_memory.h>
 #include <cpen333/process/mutex.h>
 #include <cpen333/process/unlinker.h>
-#include <cpen333/process/socket.h>
+//#include <cpen333/process/socket.h>
 #include <cpen333/console.h>
 #include <cstdio>
 #include <thread>
@@ -236,7 +236,7 @@ Product* find(int product_id) {
     {
         std::lock_guard<decltype(mutex_)> lock(mutex_);
         for (auto &product : memory_->invInf.inventory) {
-            if (Product.product_id ==product_id) {
+            if (product.product_id ==product_id) {
                productptr = &product;
                 return productptr;
             }
