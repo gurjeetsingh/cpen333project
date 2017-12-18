@@ -111,7 +111,7 @@ public:
 					product = order.products.back();         //get product info
 					std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-					if (product.left) {                        //find destination
+					if (product.side) {                        //find destination
 						go(product.row, product.col - 1);           //go there
 					}
 					else {
@@ -175,7 +175,7 @@ public:
 					//load products into delivery truck
 					while (order.products.size() > 0) {
 						Product product = order.products.back();         //get product info
-						if (product.left) {                        //find destination
+						if (product.side) {                        //find destination
 							go(product.row, product.col - 1);           //go there
 						}
 						else {

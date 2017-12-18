@@ -34,16 +34,18 @@ using namespace std;
 struct LayoutInfo {
 	int rows;           // rows in maze
 	int cols;           // columns in maze
-	char maze[MAX_WAREHOUSE_SIZE][MAX_WAREHOUSE_SIZE];  // maze storage
+	char layout[MAX_WAREHOUSE_SIZE][MAX_WAREHOUSE_SIZE];  // maze storage
 };
 
-struct Dock {
+// Rack of Shelves(represented by Hs)
+struct Rack {
 	std::vector<Shelf> left;
 	std::vector<Shelf> right;
 };
 
-struct DockInfo {
-	std::vector<std::vector<Bay>> bays;
+
+struct RackInfo {
+	std::vector<std::vector<Rack>> racks;
 };
 
 struct BayInfo {
@@ -75,10 +77,10 @@ struct SharedData {
 	LayoutInfo layoutInf;
 	BotInfo botInf; // runner info
 	InventoryInfo invInf;
-	OrderInfro ordInf;
+	OrderInfo ordInf;
 	BayInfo bay1inf;
 	BayInfo bay2inf;
-	DockInfo dinfro;
+	RackInfo rackInf;
 	bool quit;         // tell everyone to quit
 	int magic; // magic number for detecting intialization
 };

@@ -15,7 +15,7 @@ struct Order {
   int col; //coordinate for placement
   
   int poison;
-
+/*
   bool operator==(const Order& other) const {
     return ((customer_id == other.customer_id)
         && (item_id == other.item_id));
@@ -23,7 +23,7 @@ struct Order {
 
   bool operator!=(const Order& other) const {
     return !(*this == other);
-  }
+  }*/
 };
 
 #endif //LAB6_ORDER_H
