@@ -16,6 +16,7 @@ class Customer : public cpen333::thread::thread_object {
   OrderQueue& queue_;
   Menu& menu_;
   int id_;
+  cpen333::thread::semaphore served;
 
  public:
   /**
@@ -25,7 +26,7 @@ class Customer : public cpen333::thread::thread_object {
    * @param queue queue to place order into
    */
   Customer(int id, Menu& menu, OrderQueue& queue) :
-      id_(id), menu_(menu), queue_(queue) {}
+      id_(id), menu_(menu), queue_(queue), served(0) {}
 
   /**
    * Unique customer id
@@ -44,7 +45,7 @@ class Customer : public cpen333::thread::thread_object {
     //==================================================
     // TODO: Notify main method that order is ready
     //==================================================
-
+    served.notify();
   }
 
   /**
@@ -86,7 +87,8 @@ class Customer : public cpen333::thread::thread_object {
     //==================================================
     // TODO: wait for meals to be served
     //==================================================
-
+    for(int i = 0; i < items; i++)
+      served.wait();
     // stay for some time
     std::this_thread::sleep_for(std::chrono::seconds(5));
 

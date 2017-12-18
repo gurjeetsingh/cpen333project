@@ -24,10 +24,10 @@ class SingleOrderQueue : public virtual OrderQueue {
     //    - fill slot
     //    - notify others of item availability
     //=============================================
-
+    producer_.wait();
     // store next order
     order_ = order;
-
+    consumer_.notify();
   }
 
   Order get() {
@@ -38,9 +38,10 @@ class SingleOrderQueue : public virtual OrderQueue {
     //    - remove item
     //    - notify others of empty slot
     //=============================================
-
+    consumer_.wait();
     // grab next order
     Order out = order_;
+    producer_.notify();
 
     return out;
   }

@@ -5,7 +5,7 @@
 #include <vector>
 #include <fstream>
 #include <map>
-#include <json.hpp>
+#include "../include/json.hpp"
 using JSON = nlohmann::json;
 
 /**

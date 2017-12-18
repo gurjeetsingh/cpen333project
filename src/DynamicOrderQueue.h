@@ -30,8 +30,11 @@ class DynamicOrderQueue : public virtual OrderQueue {
     //    - safely add to end of internal queue
     //    - notify others of item availability
     //==================================================
-
+    {
+    unique_lock<decltype(mutex_)> lock{mutex_};
     buff_.push_back(order);
+    cv_.notify_one();
+    }
 
   }
 
@@ -44,10 +47,16 @@ class DynamicOrderQueue : public virtual OrderQueue {
     //==================================================
 
     // get first item in queue
+    {
+    unique_lock<decltype(mutex_)> lock{mutex_};
+    cv_.wait(lock, [&](){return !buff_.empty(); });
     Order out = buff_.front();
     buff_.pop_front();
-
     return out;
+
+    }
+
+
   }
 };
 

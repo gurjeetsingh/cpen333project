@@ -5,7 +5,7 @@
 #include "SingleOrderQueue.h"
 #include "CircularOrderQueue.h"
 #include "DynamicOrderQueue.h"
-
+using namespace std;
 /**
  * Main function to run the restaurant
  * @return
@@ -21,7 +21,7 @@ int main() {
 
   const int nchefs = 4;
   const int nservers = 2;
-  const int ncustomers = 30;
+  const int ncustomers = 10;
 
   //============================================
   // TODO: Change queue types to test all three
@@ -29,8 +29,12 @@ int main() {
   //    - CircularOrderQueue
   //    - DynamicOrderQueue
   //============================================
-  SingleOrderQueue order_queue;
-  SingleOrderQueue serve_queue;
+  //SingleOrderQueue order_queue;
+  //SingleOrderQueue serve_queue;
+   CircularOrderQueue order_queue;
+   CircularOrderQueue serve_queue;
+ // DynamicOrderQueue order_queue;
+ // DynamicOrderQueue serve_queue;
 
   for (int i=0; i<nchefs; ++i) {
     chefs.push_back(new Chef(i, order_queue, serve_queue));
@@ -63,20 +67,28 @@ int main() {
   //==================================================
   // TODO: Signal all chefs to leave
   //==================================================
+  Order poison = {0,0,1};
+  for(int i = 0; i < nchefs; i++){
+    order_queue.add(poison);
+  }
 
   // wait for all chefs to leave
   for (auto& chef : chefs) {
     chef->join();
   }
-
+  cout <<  "chefs have left\n";
   //==================================================
   // TODO: Signal all servers to leave
   //==================================================
 
+  for(int i = 0; i < nservers; i++){
+    serve_queue.add(poison);
+  }
   // wait for all servers to leave
   for (auto& server : servers) {
     server->join();
   }
+  cout << "servers have left\n";
 
   // free all memory
   for (auto& customer : customers) {

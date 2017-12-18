@@ -6,7 +6,7 @@
 #include <mutex>
 
 #define CIRCULAR_BUFF_SIZE 8
-
+using namespace std;
 /**
  * Queue implementation using a circular buffer
  * (i.e. a fixed-size queue)
@@ -40,11 +40,18 @@ class CircularOrderQueue : public virtual OrderQueue {
     //    - fill slot
     //    - notify others of item availability
     //==================================================
+    producer_.wait();
+
+    {
+    lock_guard<mutex> lock_add(pmutex_);
     int pidx;
     pidx = pidx_;
     // update producer index
     pidx_ = (pidx_+1)%CIRCULAR_BUFF_SIZE;
     buff_[pidx] = order;
+    }
+    
+    consumer_.notify();
 
   }
 
@@ -57,13 +64,18 @@ class CircularOrderQueue : public virtual OrderQueue {
     //    - remove item from slot
     //    - notify others of slot availability
     //==================================================
-
+    consumer_.wait();
+    Order out;
+    {
+    lock_guard<mutex> lock_get(cmutex_);
     int cidx;
     cidx = cidx_;
     // update consumer index
     cidx_ = (cidx_+1)%CIRCULAR_BUFF_SIZE;
-    Order out = buff_[cidx];
+    out = buff_[cidx];
+    }
 
+    producer_.notify();
     return out;
   }
 

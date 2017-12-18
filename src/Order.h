@@ -7,6 +7,7 @@
 struct Order {
   int customer_id;
   int item_id;
+  int poison;
 
   bool operator==(const Order& other) const {
     return ((customer_id == other.customer_id)
