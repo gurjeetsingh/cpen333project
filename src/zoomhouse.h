@@ -72,6 +72,7 @@ struct SharedData {
 	LayoutInfo layoutInf;
 	BotInfo botInf; // runner info
 	InventoryInfo invInf;
+	OrderInfro ordInf
 	BayInfo bay1inf;
 	BayInfo bay1inf;
 	DockInfo dinfro;
