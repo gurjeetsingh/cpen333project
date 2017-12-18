@@ -14,7 +14,9 @@
 #include <chrono>
 #include <thread>
 #include <stdlib.h>
+#include <vector>
 
+#include "zoomhouse.h"
 #include "DynamicOrderQueue.h"
 #include "safe_printf.h"
 
@@ -45,8 +47,8 @@ public:
 			{
 				std::lock_guard<decltype(mutex_)> lock(mutex_);
 				layoutInf_ = memory_->layoutInf;
-				id_ = memory_->botInf.nBots;
-				memory_->botInf.nBots++;
+				id_ = memory_->botInf.nbots;
+				memory_->botInf.nbots++;
 			}
 	}
 
@@ -100,7 +102,7 @@ public:
 
 			safe_printf("Bot %d starting order %d\n", id_, order.order_num);
 
-			if (order.unload) {     //UNLOADING ORDER
+			if (order.loadstatus) {     //loadstatusING ORDER
 				Product product;
 				int row = order.row;
 				int col = order.col;
@@ -132,7 +134,7 @@ public:
 					std::lock_guard<decltype(mutex_)> lock(mutex_);
 					memory_->invInf.inventory.push_back(product);       //add to inventory
 				}
-				safe_printf("Robot %d finished unloading\n", id_);
+				safe_printf("Robot %d finished loadstatusing\n", id_);
 				go(1, id_ + 1);                   //resting spot
 				std::this_thread::sleep_for(std::chrono::milliseconds(500)); \
 					order = orders_.get();

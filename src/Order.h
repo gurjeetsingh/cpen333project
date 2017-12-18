@@ -7,7 +7,7 @@
 struct Order {
   int order_num;
   int customer_id;
-  bool loadstatus; //true for unload (restock order) , false for load
+  bool loadstatus; //true for loadstatus (restock order) , false for load
   std::vector<Product> products; //vector of product objects
   int weight; //weight of order
   std::string status; //status of order

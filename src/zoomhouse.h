@@ -24,6 +24,7 @@
 
 #define MAGIC 444444
 
+#include <vector>
 #include "Catalogue.h"
 #include "Order.h"
 #include "DynamicOrderQueue.h"
@@ -74,9 +75,9 @@ struct SharedData {
 	LayoutInfo layoutInf;
 	BotInfo botInf; // runner info
 	InventoryInfo invInf;
-	OrderInfro ordInf
+	OrderInfro ordInf;
 	BayInfo bay1inf;
-	BayInfo bay1inf;
+	BayInfo bay2inf;
 	DockInfo dinfro;
 	bool quit;         // tell everyone to quit
 	int magic; // magic number for detecting intialization

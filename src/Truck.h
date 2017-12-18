@@ -6,6 +6,8 @@
 #include <deque>
 #include <condition_variable>
 #include <mutex>
+#include <vector>
+#include "Order.h"
 
 struct Truck {
 	bool isDelivery;
