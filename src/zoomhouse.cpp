@@ -32,10 +32,10 @@ void load_catalogue(Catalogue& catalogue, std::string filename) {
     std::ifstream fin(filename);
     
     if (fin.is_open()) {
-        JSON jmenu;
-        fin >> jmenu;
+        JSON jcatalogue;
+        fin >> jcatalogue;
         
-        for (auto& jitem : jmenu) {
+        for (auto& jitem : jcatalogue) {
             Product product;
            product.name = jitem["Product"];
            product.price = (int) jitem["price"];
@@ -44,7 +44,7 @@ void load_catalogue(Catalogue& catalogue, std::string filename) {
            catalogue.list_.push_back(product);
             /*
             // add newproduct
-            auto it =catalogue.menu_.insert({Product.product_id,product});
+            auto it =catalogue.catalogue_.insert({Product.product_id,product});
             if (it.second) {
                catalogue.list_.push_back(Product);
             }*/
@@ -126,7 +126,7 @@ void init_shelves(const LayoutInfo& layoutInf, RackInfo& rackInf) {
                     r.right.push_back(s);
                 }
             }
-            row.push_back(b);
+            row.push_back(r);
         }
         rackInf.racks.push_back(row);
     }
@@ -159,9 +159,9 @@ void init_docks(const LayoutInfo& layoutInf,
     }
 }
 
-void init_loadstatus_truck(const LayoutInfo& layoutInf,Catalogue& catalogue, BayInfo& binfo, Truck& truck) {
+void init_loadstatus_truck(const LayoutInfo& layoutInf,Catalogue& catalogue, RackInfo& rackInf, Truck& truck) {
     
-    auto list =catalogue.list();
+    auto list = catalogue.list();
     
     // start random number generator
     std::default_random_engine rnd((unsigned int)std::chrono::system_clock::now().time_since_epoch().count());
@@ -188,12 +188,12 @@ void init_loadstatus_truck(const LayoutInfo& layoutInf,Catalogue& catalogue, Bay
             if (layoutInf.layout[r][c] == SHELF_CHAR) {
                 if (dist(rnd)%2 == 1) {
                     l = true;                       // left
-                    if (binfo.racks[r][c].left[s].weight +product.weight < 100) {
+                    if (rackInf.racks[r][c].left[s].weight +product.weight < 100) {
                         shelf_vacant = true;
                     }
                 } else {
                     l = false;
-                    if (binfo.racks[r][c].right[s].weight +product.weight < 100) {
+                    if (rackInf.racks[r][c].right[s].weight +product.weight < 100) {
                         shelf_vacant = true;
                     }
                 }
@@ -218,7 +218,7 @@ void print_options() {
     std::cout << " (1) Initialize memory"  << std::endl;
     std::cout << " (2) Start server" << std::endl;
     std::cout << " (3) Add robot" << std::endl;
-    std::cout << " (4) Add unload truck" << std::endl;
+    std::cout << " (4) Add restock truck" << std::endl;
     std::cout << " (5) Add delivery truck" << std::endl;
     std::cout << " (6) Check order status" << std::endl;
     std::cout << " (7) Check inventory" << std::endl;
@@ -229,26 +229,26 @@ void print_options() {
 }
 
 Product* find(int product_id) {
-    cpen333::process::mutex mutex_(WAREHOUSE_MUTEX_NAME);
-    cpen333::process::shared_object<SharedData> memory_(WAREHOUSE_MEMORY_NAME);
+    cpen333::process::mutex mutex_(ZOOMHOUSE_MUTEX_NAME);
+    cpen333::process::shared_object<SharedData> memory_(ZOOMHOUSE_MEMORY_NAME);
     
-   product*productptr = nullptr;
+   Product* productptr = nullptr;
     {
         std::lock_guard<decltype(mutex_)> lock(mutex_);
-        for (auto &Product : memory_->sinfo.stock) {
+        for (auto &product : memory_->invInf.inventory) {
             if (Product.product_id ==product_id) {
-               productptr = &Product;
-                returnproductptr;
+               productptr = &product;
+                return productptr;
             }
         }
     }
-    returnproductptr;
+    return productptr;
 }
 
 void check_status(int orderid) {
     
-    cpen333::process::mutex mutex_(WAREHOUSE_MUTEX_NAME);
-    cpen333::process::shared_object<SharedData> memory_(WAREHOUSE_MEMORY_NAME);
+    cpen333::process::mutex mutex_(ZOOMHOUSE_MUTEX_NAME);
+    cpen333::process::shared_object<SharedData> memory_(ZOOMHOUSE_MEMORY_NAME);
     
     std::string status = "status not found";
     {
@@ -260,76 +260,76 @@ void check_status(int orderid) {
 
 void check_inventory() {
     
-    cpen333::process::mutex mutex_(WAREHOUSE_MUTEX_NAME);
-    cpen333::process::shared_object<SharedData> memory_(WAREHOUSE_MEMORY_NAME);
+    cpen333::process::mutex mutex_(ZOOMHOUSE_MUTEX_NAME);
+    cpen333::process::shared_object<SharedData> memory_(ZOOMHOUSE_MEMORY_NAME);
     
     //count array contains quantity when usingproduct id as index
     std::vector<int> count;
     
     //initializing
-    for (int i = 0; i < MAX_ProductS; i++) {
+    for (int i = 0; i < MAX_PRODUCTS; i++) {
         count.push_back(0);
     }
     
     //counting
     {
         std::lock_guard<decltype(mutex_)> lock(mutex_);
-        for (auto &Product : memory_->sinfo.stock) {
+        for (auto &Product : memory_->invInf.inventory) {
             count[Product.product_id]++;
         }
     }
     
     //printing
-    for (int i = 0; i < MAX_ProductS; i++) {
+    for (int i = 0; i < MAX_PRODUCTS; i++) {
         safe_printf("There are %d ofproduct %d in stock\n", count[i], i);
     }
 }
 
 void low_stock_alert() {
     
-    cpen333::process::mutex mutex_(WAREHOUSE_MUTEX_NAME);
-    cpen333::process::shared_object<SharedData> memory_(WAREHOUSE_MEMORY_NAME);
+    cpen333::process::mutex mutex_(ZOOMHOUSE_MUTEX_NAME);
+    cpen333::process::shared_object<SharedData> memory_(ZOOMHOUSE_MEMORY_NAME);
     
     //count array contains quantity when usingproduct id as index
     std::vector<int> count;
     
     //initializing
-    for (int i = 0; i < MAX_ProductS; i++) {
+    for (int i = 0; i < MAX_PRODUCTS; i++) {
         count.push_back(0);
     }
     
     //counting
     {
         std::lock_guard<decltype(mutex_)> lock(mutex_);
-        for (auto &Product : memory_->sinfo.stock) {
+        for (auto &Product : memory_->invInf.inventory) {
             count[Product.product_id]++;
         }
     }
     
     //printing
-    for (int i = 0; i < MAX_ProductS; i++) {
+    for (int i = 0; i < MAX_PRODUCTS; i++) {
         if (count[i] < 3) {
             safe_printf("There are only %d ofproduct %d in stock\n", count[i], i);
         }
     }
 }
-
+/*
 void service(int client_id, DynamicOrderQueue& orders, cpen333::process::socket&& socket) {
     
-    cpen333::process::mutex mutex_(WAREHOUSE_MUTEX_NAME);
-    cpen333::process::shared_object<SharedData> memory_(WAREHOUSE_MEMORY_NAME);
+    cpen333::process::mutex mutex_(ZOOMHOUSE_MUTEX_NAME);
+    cpen333::process::shared_object<SharedData> memory_(ZOOMHOUSE_MEMORY_NAME);
     
     {
         std::lock_guard<decltype(mutex_)> lock(mutex_);
-        auto list = memory_->menu.list();
-        for (auto &Product : list) {
+        auto list = memory_->catalogue.list();
+        for (auto &product : list) {
             std::string msg = "";
             msg = msg + "Product: " +product.name;
-            msg = msg + ",product id: " + std::to_string(Product.product_id);
-            msg = msg + ", price: " + std::to_string(Product.price);
-            msg = msg + ", weight: " + std::to_string(Product.weight);
-            socket.write(&chat::CMD_MSG, 1);
-            socket.write(msg);
+            msg = msg + ",product id: " + std::to_string(product.product_id);
+            msg = msg + ", price: " + std::to_string(product.price);
+            msg = msg + ", weight: " + std::to_string(product.weight);
+            //socket.write(&chat::CMD_MSG, 1);
+            //socket.write(msg);
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     }
@@ -350,15 +350,15 @@ void service(int client_id, DynamicOrderQueue& orders, cpen333::process::socket&
     
     
     
-    int orderid = 0;
+    int ordernum = 0;
     {
         std::lock_guard<decltype(mutex_)> lock(mutex_);
         Order order;
         order.loadstatus = false;
         order.weight = 0;
         order.customer_id = client_id;
-        orderid = (int) memory_->ordInf.orders.size();
-        order.order_id = orderid;
+        ordernum = (int) memory_->ordInf.orders.size();
+        order.order_num = ordernum;
         memory_->ordInf.orders.push_back(order);
     }
     
@@ -371,15 +371,15 @@ void service(int client_id, DynamicOrderQueue& orders, cpen333::process::socket&
             if (read > 0) {
                 buff[read] = 0;
                 //check stock forproduct
-                intproduct_id = std::stoi(buff);
-               product*productptr = find(product_id);      //getproduct object
-                if (Productptr != nullptr) {           //ifproduct got
+                int product_id = std::stoi(buff);
+               Product* productptr = find(product_id);      //getproduct object
+                if (productptr != nullptr) {           //ifproduct got
                     {
                         std::lock_guard<decltype(mutex_)> lock(mutex_);
-                        memory_->ordInf.orders[orderid].Products.push_back(*Productptr);        //put in order
-                        auto it = std::find(memory_->sinfo.stock.begin(), memory_->sinfo.stock.end(), *Productptr);
-                        if (it != memory_->sinfo.stock.end()) {
-                                memory_->sinfo.stock.erase(it);             //and remove from stock info
+                        memory_->ordInf.orders[ordernum].products.push_back(*productptr);        //put in order
+                        auto it = std::find(memory_->invInf.inventory.begin(), memory_->invInf.inventory.end(), *Productptr);
+                        if (it != memory_->invInf.inventory.end()) {
+                                memory_->invInf.inventory.erase(it);             //and remove from stock info
                         } else {
                             safe_printf("ERROR\n");
                         }
@@ -435,15 +435,15 @@ void server(DynamicOrderQueue& orders) {
     }
 }
 
-
+*/
 /**
  * Main function to run the warehouse
  */
 int main() {
 
-    cpen333::process::condition_variable cv(WAREHOUSE_CV_NAME);
-    cpen333::process::mutex mutex(WAREHOUSE_MUTEX_NAME);
-    cpen333::process::shared_object<SharedData> memory(WAREHOUSE_MEMORY_NAME);
+    cpen333::process::condition_variable cv(ZOOMHOUSE_CONDITION_VARIABLE;
+    cpen333::process::mutex mutex(ZOOMHOUSE_MUTEX_NAME);
+    cpen333::process::shared_object<SharedData> memory(ZOOMHOUSE_MEMORY_NAME);
     
     cpen333::process::unlinker<decltype(cv)> cvu(cv);
     cpen333::process::unlinker<decltype(mutex)> mutexu(mutex);
@@ -452,7 +452,7 @@ int main() {
     DynamicOrderQueue order_queue;
     DynamicTruckQueue truck_queue;
     
-    std::vector<Robot*> robots;
+    std::vector<Bot*> bots;
 
     char cmd = 0;
     while (true) {
@@ -464,27 +464,27 @@ int main() {
         switch(cmd) {
             
             case '1': {
-                load_menu(memory->menu, "stock.json");
+                load_catalogue(memory->catalogue, "stock.json");
                 load_layout("layout0.txt", memory->layoutInf);
                 init_robots(memory->layoutInf, memory->botInf);
-                init_shelves(memory->layoutInf, memory->binfo);
-                //init_stock(memory->menu, memory->sinfo);
-                init_docks(memory->layoutInf, memory->d1info, memory->d2info, order_queue, truck_queue);
+                init_shelves(memory->layoutInf, memory->rackInf);
+                //init_stock(memory->catalogue, memory->sinfo);
+                init_docks(memory->layoutInf, memory->bay1inf, memory->bay2inf, order_queue, truck_queue);
                 break;
             }
-            case '2': {
+            /*case '2': {
                 std::thread thread(server, std::ref(order_queue));
                 thread.detach();
                 break;
-            }
+            }*/
             case '3': {
-                robots.push_back(new Robot(order_queue));
-                robots.back()->start();
+                bots.push_back(new Bot(order_queue));
+                bots.back()->start();
                 break;
             }
             case '4': {
                 Truck truck;
-                init_loadstatus_truck(memory->layoutInf, memory->menu, memory->binfo, truck);
+                init_loadstatus_truck(memory->layoutInf, memory->catalogue, memory->rackInf, truck);
                 truck_queue.add(truck);
                 break;
             }
