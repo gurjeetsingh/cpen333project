@@ -102,6 +102,7 @@ void init_robots(const LayoutInfo& layoutInf, BotInfo& botInf) {
     for (size_t i=0; i<MAX_BOTS; ++i) {
         // generate until on an empty space
         size_t r,c;
+		r = 1;
         do {
             r = rdist(rnd);
             c = cdist(rnd);

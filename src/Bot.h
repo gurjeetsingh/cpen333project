@@ -35,14 +35,6 @@ public:
 		id_(0), layoutInf_(), orders_(orders) {
 
 			
-			{
-				std::lock_guard<decltype(mutex_)> lock(mutex_);
-				if (memory_->magic != MAGIC) {
-					std::cout << "uninitialzied memory";
-					return;
-				}
-			}
-
 
 			{
 				std::lock_guard<decltype(mutex_)> lock(mutex_);
