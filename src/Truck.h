@@ -64,7 +64,7 @@ public:
 			// get first item in queue
 			Truck out = buff_.front();
 			if (!out.isDelivery) {
-				out.orders[0].status = "in loading dock";
+				out.orders[0].status = "in loading bay";
 			}
 			buff_.pop_front();
 			return out;

@@ -174,7 +174,7 @@ public:
 				else {
 					//load products into delivery truck
 					while (order.products.size() > 0) {
-						product product = order.products.back();         //get product info
+						Product product = order.products.back();         //get product info
 						if (product.left) {                        //find destination
 							go(product.row, product.col - 1);           //go there
 						}
