@@ -111,7 +111,7 @@ void init_robots(const LayoutInfo& layoutInf, BotInfo& botInf) {
     }
 }
 
-void init_shelves(const LayoutInfo& layoutInf, BayInfo& binfo) {
+void init_shelves(const LayoutInfo& layoutInf, RackInfo& rackInf) {
     
     for (int r = 0; r < layoutInf.rows; r++) {
         std::vector<Rack> row;
@@ -133,21 +133,21 @@ void init_shelves(const LayoutInfo& layoutInf, BayInfo& binfo) {
 }
 
 void init_docks(const LayoutInfo& layoutInf,
-                DockInfo& d1info, DockInfo& d2info, DynamicOrderQueue& orders, DynamicTruckQueue& trucks) {
+                BayInfo& d1info, BayInfo& d2info, DynamicOrderQueue& orders, DynamicTruckQueue& trucks) {
     
     int i = 0;
     
-    std::vector<LoadingDock*> docks;
+    std::vector<LoadingBay*> bays;
     
     for (size_t r = 0; r < layoutInf.rows; r++) {
         for ( size_t c = 0; c < layoutInf.cols; c++) {
             char ch = layoutInf.layout[r][c];
-            if (ch == DOCK_CHAR) {
+            if (ch == LOADING_BAY_CHAR) {
                 if (i == 0) {
-                    docks.push_back(new LoadingDock(i, (int)r, (int)c, d1info, orders, trucks));
+                    bays.push_back(new LoadingBay(i, (int)r, (int)c, d1info, orders, trucks));
                     i++;
                 } else {
-                    docks.push_back(new LoadingDock(i, (int)r, (int)c, d2info, orders, trucks));
+                    bays.push_back(new LoadingBay(i, (int)r, (int)c, d2info, orders, trucks));
                     i++;
                 }
             }
@@ -155,11 +155,11 @@ void init_docks(const LayoutInfo& layoutInf,
     }
     
     for (int j = 0; j < i; j++) {
-        docks[j]->start();
+        bays[j]->start();
     }
 }
 
-void init_loadstatus_truck(const LayoutInfo& layoutInf,catalogue&catalogue, BayInfo& binfo, Truck& truck) {
+void init_loadstatus_truck(const LayoutInfo& layoutInf,Catalogue& catalogue, BayInfo& binfo, Truck& truck) {
     
     auto list =catalogue.list();
     
@@ -175,7 +175,7 @@ void init_loadstatus_truck(const LayoutInfo& layoutInf,catalogue&catalogue, BayI
     for (int i = 0; i < 2; i++) {
         // generate randomproduct
         int id = (int) dist(rnd) % list.size();
-       productproduct = list[id];
+       Product product = list[id];
         // generate random position until on an avaliable shelf
         int r,c,s;
         bool l, shelf_vacant;
@@ -188,12 +188,12 @@ void init_loadstatus_truck(const LayoutInfo& layoutInf,catalogue&catalogue, BayI
             if (layoutInf.layout[r][c] == SHELF_CHAR) {
                 if (dist(rnd)%2 == 1) {
                     l = true;                       // left
-                    if (binfo.bays[r][c].left[s].weight +product.weight < 100) {
+                    if (binfo.racks[r][c].left[s].weight +product.weight < 100) {
                         shelf_vacant = true;
                     }
                 } else {
                     l = false;
-                    if (binfo.bays[r][c].right[s].weight +product.weight < 100) {
+                    if (binfo.racks[r][c].right[s].weight +product.weight < 100) {
                         shelf_vacant = true;
                     }
                 }
@@ -202,9 +202,9 @@ void init_loadstatus_truck(const LayoutInfo& layoutInf,catalogue&catalogue, BayI
         
        product.row = r;
        product.col = c;
-       product.left = l;
+       product.side = l;
        product.rack_level = s;
-        order.Products.push_back(Product);
+        order.products.push_back(product);
     }
     truck.orders.push_back(order);
 }
@@ -213,7 +213,7 @@ void print_options() {
     
     std::cout << std::endl;
     std::cout << "=========================================" << std::endl;
-    std::cout << "=                 catalogue                 =" << std::endl;
+    std::cout << "=                 Catalogue                 =" << std::endl;
     std::cout << "=========================================" << std::endl;
     std::cout << " (0) Unlink memory" << std::endl;
     std::cout << " (1) Initialize memory"  << std::endl;

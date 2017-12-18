@@ -12,7 +12,7 @@
 
 #define WALL_CHAR 'X'
 #define EMPTY_CHAR ' '
-#define DOCKING_BAY_CHAR 'B'
+#define LOADING_BAY_CHAR 'B'
 #define SHELF_CHAR 'H'//because an H looks kinda like a shelf
 
 #define COL_IDX 0
