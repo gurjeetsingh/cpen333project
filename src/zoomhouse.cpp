@@ -215,7 +215,6 @@ void print_options() {
     std::cout << "=========================================" << std::endl;
     std::cout << "=                 Catalogue                 =" << std::endl;
     std::cout << "=========================================" << std::endl;
-    std::cout << " (0) Unlink memory" << std::endl;
     std::cout << " (1) Initialize memory"  << std::endl;
     std::cout << " (2) Start server" << std::endl;
     std::cout << " (3) Add robot" << std::endl;
@@ -463,12 +462,7 @@ int main() {
         std::cin.ignore (std::numeric_limits<std::streamsize>::max(), '\n');        // remove '\n'
         
         switch(cmd) {
-            case '0': {
-                memory.unlink();
-                std::cout << "done" << std::endl;
-                return 0;
-                break;
-            }
+            
             case '1': {
                 load_menu(memory->menu, "stock.json");
                 load_layout("layout0.txt", memory->layoutInf);
