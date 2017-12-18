@@ -11,11 +11,13 @@ using JSON = nlohmann::json;
 /**
  * Menu items
  */
-struct MenuItem {
+struct Warehouse {
   std::string item;
-  std::string description;
-  std::string meal;
-  std::string course;
+  std::string hockeyStick;
+  std::string soccerball;
+  std::string basketball;
+  std::string puck;
+  std::string net;
   float price;
   int id;
 };
@@ -24,14 +26,11 @@ struct MenuItem {
  * Menu, containing list of items that can
  * be ordered at the restaurant
  */
-class Menu {
-  std::map<int,MenuItem> menu_;
-  std::vector<MenuItem> appetizers_;
-  std::vector<MenuItem> mains_;
-  std::vector<MenuItem> desserts_;
+class Product {
+  std::map<int,WarehouseItem> product_;
 
  public:
-  Menu(): menu_(), appetizers_(), mains_(), desserts_() {}
+  Warehouse(): menu_(), appetizers_(), mains_(), desserts_() {}
 
   /**
    * Loads items from a JSON file

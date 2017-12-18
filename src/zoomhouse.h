@@ -25,8 +25,10 @@
 #define MAGIC 444444
 
 #include "Catalogue.h"
+#include "Order.h"
 #include "DynamicOrderQueue.h"
 #include "Truck.h"
+using namespace std;
 
 struct LayoutInfo {
 	int rows;           // rows in maze

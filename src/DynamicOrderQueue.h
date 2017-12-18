@@ -52,6 +52,7 @@ class DynamicOrderQueue : public virtual OrderQueue {
     cv_.wait(lock, [&](){return !buff_.empty(); });
     Order out = buff_.front();
     buff_.pop_front();
+	out.status = "inprogress";
     return out;
 
     }
